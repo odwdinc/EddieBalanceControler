@@ -1,9 +1,6 @@
 package com.example.anthony.eddiebalancecontroler.eddie;
 
-import com.example.anthony.eddiebalancecontroler.DatagramHandler;
-
 import java.io.IOException;
-import java.net.UnknownHostException;
 
 import static com.example.anthony.eddiebalancecontroler.MainActivity.print;
 
@@ -15,10 +12,10 @@ public class UDP_RxThread  extends Thread{
     private final Eddie eddie;
     private int port;
     DatagramHandler dh_recive; 	//DatagramHandler
-    public boolean running =true;
+    private boolean running =true;
 
-    public UDP_RxThread(int udpRespondPort, Eddie eddie) {
-        this.port = port;
+    UDP_RxThread(int udpRespondPort, Eddie eddie) {
+        this.port = udpRespondPort;
         this.dh_recive = new DatagramHandler(port);
         this.eddie = eddie;
     }
@@ -78,5 +75,8 @@ public class UDP_RxThread  extends Thread{
             }
         }
 
+    }
+    public void stopRX(){
+        running = false;
     }
 }

@@ -21,89 +21,6 @@
         android:gravity="center_horizontal"
         android:layout_alignParentTop="true" />
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true">
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@+id/joystickView">
-
-            <RadioGroup
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:gravity="center_horizontal">
-
-                <RadioButton
-                    android:text="Pitch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/pitchMode"
-                    tools:text="Pitch" />
-
-                <RadioButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/speedMode"
-                    android:layout_marginLeft="0dp"
-                    tools:text="Speed"
-                    android:text="Speed" />
-
-                <Button
-                    android:text="Update"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/Updatebutton"
-                    android:layout_weight="0"
-                    android:layout_width="wrap_content"
-                    android:elevation="0dp"
-                    android:layout_marginLeft="50dp" />
-
-            </RadioGroup>
-
-            <TextView
-                android:text="P"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/textViewP" />
-
-            <SeekBar
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/seekBarP"
-                android:max="100" />
-
-            <TextView
-                android:text="I"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/textViewI" />
-
-            <SeekBar
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/seekBarI"
-                android:max="100" />
-
-            <TextView
-                android:text="D"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/textViewD" />
-
-            <SeekBar
-                android:layout_width="match_parent"
-                android:id="@+id/seekBarD"
-                android:layout_height="wrap_content"
-                android:max="100" />
-
-        </LinearLayout>
-
         <io.github.controlwear.virtual.joystick.android.JoystickView
             android:id="@+id/joystickView"
             android:layout_width="wrap_content"
@@ -111,7 +28,14 @@
             custom:JV_fixedCenter="true"
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
-            android:layout_height="350dp" />
+            android:layout_height="wrap_content" />
 
-    </RelativeLayout>
+    <Button
+        android:text="Settings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/Settings" />
+
 </RelativeLayout>

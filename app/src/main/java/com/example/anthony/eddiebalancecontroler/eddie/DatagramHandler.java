@@ -1,4 +1,4 @@
-package com.example.anthony.eddiebalancecontroler;
+package com.example.anthony.eddiebalancecontroler.eddie;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -11,11 +11,11 @@ import java.net.UnknownHostException;
  * Created by antho on 1/24/2017.
  */
 
-public class DatagramHandler {
+class DatagramHandler {
 
-    public static final char UDP_COMMAND_PORT= 4242; //UDP Port for receiving command packets
-    public static final char UDP_CONTROL_PORT = 4240; //UDP Port for receiving control packets
-    public static final char  UDP_RESPOND_PORT =4243; //UDP Port for returning data to user
+    static final char UDP_COMMAND_PORT= 4242; //UDP Port for receiving command packets
+    static final char UDP_CONTROL_PORT = 4240; //UDP Port for receiving control packets
+    static final char  UDP_RESPOND_PORT =4243; //UDP Port for returning data to user
     private static final char MAXMESSAGESIZE =64;
 
 
@@ -25,7 +25,7 @@ public class DatagramHandler {
     private int port;
     private InetAddress address;
 
-    public DatagramHandler(String address, int port) throws UnknownHostException {
+    DatagramHandler(String address, int port) throws UnknownHostException {
         this.address =InetAddress.getByName(address) ;
         this.port = port;
         try {
@@ -36,7 +36,7 @@ public class DatagramHandler {
     }
 
 
-    public DatagramHandler(int udpListenPort) {
+    DatagramHandler(int udpListenPort) {
         try {
             Socket = new DatagramSocket(udpListenPort);
         } catch (SocketException e) {
@@ -45,7 +45,7 @@ public class DatagramHandler {
         Packet= new DatagramPacket(message, message.length);
     }
 
-    public void send(String data) {
+    void send(String data) {
         Packet = new DatagramPacket(data.getBytes(), data.length(), address, port);
         try {
             Socket.send(Packet);
@@ -54,20 +54,20 @@ public class DatagramHandler {
         }
     }
 
-    public void close() {
+    void close() {
         Socket.close();
     }
 
-    public boolean hasData() throws IOException {
+    boolean hasData() throws IOException {
         Socket.receive(Packet);
         return (Packet.getLength() != 0);
     }
 
-    public String receive() {
-        String text = new String(message, 0, Packet.getLength());
-        return text;
+    String receive() {
+        return  new String(message, 0, Packet.getLength());
     }
-    public String receiveIP() {
+
+    String receiveIP() {
         return Packet.getAddress().getHostAddress();
     }
 

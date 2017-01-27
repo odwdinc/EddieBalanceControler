@@ -1,4 +1,5 @@
 package com.example.anthony.eddiebalancecontroler;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,15 +22,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private TextView myLabel;
-    private TextView myLabelP;
-    private TextView myLabelI;
-    private TextView myLabelD;
-    private SeekBar mySeekP;
-    private SeekBar mySeekI;
-    private SeekBar mySeekD;
-    private RadioButton pitchMode;
-    private RadioButton speedMode;
-    private Button Updatebutton;
     private Eddie eddie;
 
     public static int print(String buffer, Object... b) {
@@ -38,10 +30,6 @@ public class MainActivity extends AppCompatActivity {
         return buffer.length();
     }
 
-    double oldx=0,oldy=0;
-
-    int mode =0; //0=pitch ,1=speed
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,62 +37,23 @@ public class MainActivity extends AppCompatActivity {
 
 
         myLabel= (TextView) findViewById(R.id.textView);
-        myLabelP= (TextView) findViewById(R.id.textViewP);
-        myLabelI= (TextView) findViewById(R.id.textViewI);
-        myLabelD= (TextView) findViewById(R.id.textViewD);
-
-        mySeekP = (SeekBar) findViewById(R.id.seekBarP);
-        mySeekI = (SeekBar) findViewById(R.id.seekBarI);
-        mySeekD = (SeekBar) findViewById(R.id.seekBarD);
-
-        mySeekP.setOnSeekBarChangeListener(seeker);
-        mySeekI.setOnSeekBarChangeListener(seeker);
-        mySeekD.setOnSeekBarChangeListener(seeker);
-
-        pitchMode = (RadioButton) findViewById(R.id.pitchMode);
-        pitchMode.setChecked(true);
-        speedMode = (RadioButton) findViewById(R.id.speedMode);
-
-        pitchMode.setOnClickListener(onRadioButtonClicked);
-        speedMode.setOnClickListener(onRadioButtonClicked);
+        Button Settings = (Button) findViewById(R.id.Settings);
+        Settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, SettingsActvity.class);
+                MainActivity.this.eddie.onDestroy();
+                startActivity(intent);
+                finish();
+            }
+        });
 
 
-        Updatebutton = (Button) findViewById(R.id.Updatebutton);
 
-        Updatebutton.setOnClickListener(onButtonClicked);
-
-        this.eddie = new Eddie() {
+        this.eddie = new Eddie(this) {
             @Override
             public void handalPIDUPdate(final String id) {
-                runOnUiThread(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        String[] pidlist = id.split(":");
-                        pidlist = pidlist[1].split(",");
-                        float P = 0;
-                        int I = 0;
-                        int D =0;
-                        if(mode == 0) {
-                            P = Float.parseFloat(pidlist[0]);
-                            I = (int)Float.parseFloat(pidlist[1]);
-                            D =  (int)Float.parseFloat(pidlist[2]);
-                        }else if (mode ==1){
-                            P = Float.parseFloat(pidlist[3]);
-                            I =(int)Float.parseFloat(pidlist[4]);
-                            D = (int)Float.parseFloat(pidlist[5]);
-                        }
-                        mySeekP.setProgress((int)(P*10),true);
-                        myLabelP.setText("P: "+Float.toString(P));
-
-                        mySeekI.setProgress((int)(I/10),true);
-                        myLabelI.setText("I: "+Float.toString(I));
-
-                        mySeekD.setProgress((int)(D),true);
-                        myLabelD.setText("D: "+Float.toString(D));
-
-                    }
-                });
             }
 
             @Override
@@ -128,8 +77,8 @@ public class MainActivity extends AppCompatActivity {
 
                 double x = (strength)* Math.cos((Math.toRadians(angle)));
                 double y = (strength)* Math.sin((Math.toRadians(angle)));
-                if(Math.abs(x-oldx) > 2){
-                    oldx = x;
+                if(Math.abs(x-eddie.oldx) > 2){
+                    eddie.oldx = x;
                     x = ((x/100)*eddie.TurnSpeed);
                     if(abs(x) < eddie.TurnSpeed){
                         if(eddie.BIND) {
@@ -138,8 +87,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                if(Math.abs(y-oldy) > 2){
-                    oldy = y;
+                if(Math.abs(y-eddie.oldy) > 2){
+                    eddie.oldy = y;
                     if(eddie.BIND) {
                         y=((y/100)*eddie.DriveSpeed);
                         if(abs(y)<eddie.DriveSpeed) {
@@ -147,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
-                if((oldx == x) || (oldy == y) ) {
+                if((eddie.oldx == x) || (eddie.oldy == y) ) {
                     if(eddie.BIND) {
                         //print("onMove  angle: %d (%d, %d) ,strength: %d", angle, (int)x, (int)y, strength);
                     }
@@ -157,88 +106,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
-    View.OnClickListener onButtonClicked = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            // Update
-            if(eddie.BIND) {
-                float P = mySeekP.getProgress() / 10;
-                float I = mySeekI.getProgress() * 10.0f;
-                float D = mySeekD.getProgress() * 1.0f;
-                if (mode == 1) {
-                    eddie.send("SPIDP%3.3f",P);
-                    eddie.send("SPIDI%3.3f",I);
-                    eddie.send("SPIDD%3.3f",D);
-                }else{
-                    eddie.send("PPIDP%3.3f",P);
-                    eddie.send("PPIDI%3.3f",I);
-                    eddie.send("PPIDD%3.3f",D);
-                }
-            }
-        }
-    };
-
-    View.OnClickListener onRadioButtonClicked =new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            boolean checked = ((RadioButton) view).isChecked();
-
-            // Check which radio button was clicked
-            switch(view.getId()) {
-                case R.id.pitchMode:
-                    if (checked)
-                        // P
-                        mode = 0;
-                        break;
-                case R.id.speedMode:
-                    if (checked)
-                        // speedMode
-                        mode = 1;
-                        break;
-            }
-
-            if(eddie.BIND){
-                eddie.send("GETPIDS");
-            }
-        }
-    };
-
-
-    SeekBar.OnSeekBarChangeListener seeker = new SeekBar.OnSeekBarChangeListener() {
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            switch(seekBar.getId()) {
-                case R.id.seekBarP:
-                    // P
-                    myLabelP.setText("P: "+Float.toString(progress/10));
-                    break;
-                case R.id.seekBarI:
-                    // D
-                    myLabelI.setText("P: "+Float.toString(progress*10));
-                    break;
-                case R.id.seekBarD:
-                    // D
-                    myLabelD.setText("P: "+Float.toString(progress*10));
-                    break;
-            }
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
-    };
-
-
     @Override
     protected void onDestroy() {
+        eddie.onDestroy();
         super.onDestroy();
     }
 
